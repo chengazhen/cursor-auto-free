@@ -255,6 +255,9 @@ if __name__ == "__main__":
         ExitCursor()
         logging.info("正在初始化浏览器...")
         browser_manager = BrowserManager()
+        # 如果自定义浏览器执行文件路径，在此处设置
+        if Config().get_browser_path():
+            browser_manager.set_browser_path(Config().get_browser_path())
         browser = browser_manager.init_browser()
 
         logging.info("正在初始化邮箱验证模块...")

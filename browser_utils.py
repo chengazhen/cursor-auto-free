@@ -10,6 +10,11 @@ load_dotenv()
 class BrowserManager:
     def __init__(self):
         self.browser = None
+        self.browser_executable_path = None
+
+    def set_browser_path(self, path):
+      """设置浏览器执行文件路径"""
+      self.browser_executable_path = path
 
     def init_browser(self):
         """初始化浏览器"""
@@ -42,6 +47,10 @@ class BrowserManager:
         if sys.platform == "darwin":
             co.set_argument("--no-sandbox")
             co.set_argument("--disable-gpu")
+
+        # 检查是否设置了浏览器路径
+        if self.browser_executable_path:
+            co.set_browser_path(self.browser_executable_path)
 
         return co
 

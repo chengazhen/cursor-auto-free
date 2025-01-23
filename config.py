@@ -36,6 +36,9 @@ class Config:
             self.imap_pass = os.getenv("IMAP_PASS", "").strip()
             self.imap_dir = os.getenv("IMAP_DIR", "inbox").strip()
 
+        # 自定义浏览器执行文件目录
+        self.browser_path = os.getenv("BROWSER_EXECUTABLE_PATH", "").strip()
+
         self.check_config()
 
     def get_temp_mail(self):
@@ -55,6 +58,9 @@ class Config:
 
     def get_domain(self):
         return self.domain
+
+    def get_browser_path(self):
+        return self.browser_path
 
     def check_config(self):
         """检查配置项是否有效
