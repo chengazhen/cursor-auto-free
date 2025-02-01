@@ -35,22 +35,20 @@ def handle_turnstile(tab):
                     time.sleep(random.uniform(1, 3))
                     challengeCheck.click()
                     time.sleep(2)
-                    logging.info("Turnstile 验证通过")
-                    return True
+                if tab.ele("@name=password"):
+                  logging.info("验证成功 - 已到达密码输入页面")
+                  break
+                if tab.ele("@data-index=0"):
+                  logging.info("验证成功 - 已到达验证码输入页面")
+                  break
+                if tab.ele("Account Settings"):
+                  logging.info("验证成功 - 已到达账户设置页面")
+                  break           
+                raise Exception("Turnstile 验证失败: 用户验证未通过")
             except:
                 pass
-
-            if tab.ele("@name=password"):
-                logging.info("验证成功 - 已到达密码输入页面")
-                break
-            if tab.ele("@data-index=0"):
-                logging.info("验证成功 - 已到达验证码输入页面")
-                break
-            if tab.ele("Account Settings"):
-                logging.info("验证成功 - 已到达账户设置页面")
-                break
-
-            time.sleep(random.uniform(1, 2))
+            logging.error(f"Turnstile 验证失败: Can’t verify the user is human")
+            return False
     except Exception as e:
         logging.error(f"Turnstile 验证失败: {str(e)}")
         return False
