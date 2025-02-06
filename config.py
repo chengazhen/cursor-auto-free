@@ -24,7 +24,8 @@ class Config:
         load_dotenv(dotenv_path)
 
         self.imap = False
-        self.temp_mail = os.getenv("TEMP_MAIL", "").strip().split("@")[0]
+        # self.temp_mail = os.getenv("TEMP_MAIL", "").strip().split("@")[0]
+        self.temp_mail = os.getenv("TEMP_MAIL", "").strip()
         self.temp_mail_epin = os.getenv("TEMP_MAIL_EPIN", "").strip()
         self.temp_mail_ext = os.getenv("TEMP_MAIL_EXT", "").strip()
         self.domain = os.getenv("DOMAIN", "").strip()
