@@ -307,8 +307,11 @@ def check_cursor_version():
 
 
 def reset_machine_id(greater_than_0_45):
+    """
+    根据版本执行不同的重置机器码流程
+    只在选项3中使用，包含修改 Cursor.app 的逻辑
+    """
     if greater_than_0_45:
-        # 提示请手动执行脚本 https://github.com/chengazhen/cursor-auto-free/blob/main/patch_cursor_get_machine_id.py
         patch_cursor_get_machine_id.patch_cursor_get_machine_id()
     else:
         MachineIDResetter().reset_machine_ids()
@@ -322,30 +325,44 @@ if __name__ == "__main__":
         logging.info("\n=== 初始化程序 ===")
         # 提示用户选择操作模式
         print("\n请选择操作模式:")
-        print("1. 仅重置机器码")
-        print("2. 完整注册流程")
+        print("1. 仅重置机器码（不注册新账号，不修改Cursor.app）")
+        print("2. 注册新账号 + 重置机器码（不修改Cursor.app）")
+        print("3. 完整流程：注册新账号 + 重置机器码 + 修改Cursor.app")
+        print("4. 仅修改Cursor.app")
 
         while True:
             try:
-                choice = int(input("请输入选项 (1 或 2): ").strip())
-                if choice in [1, 2]:
+                choice = int(input("请输入选项 (1-4): ").strip())
+                if choice in [1, 2, 3, 4]:
                     break
                 else:
                     print("无效的选项,请重新输入")
             except ValueError:
                 print("请输入有效的数字")
 
+        # 检查选项3和4是否满足版本要求
+        if (choice in [3, 4]) and not greater_than_0_45:
+            logging.error("当前Cursor版本不支持修改Cursor.app（需要 >= 0.45.x）")
+            input("\n按任意键退出...")
+            sys.exit(1)
+
+        # 所有操作前先关闭 Cursor
+        logging.info("正在关闭 Cursor...")
+        ExitCursor()
+
         if choice == 1:
-            # 仅执行重置机器码
-            reset_machine_id(greater_than_0_45)
+            # 仅执行重置机器码，不检查和修改 Cursor.app
+            logging.info("执行重置机器码...")
+            MachineIDResetter().reset_machine_ids()
             logging.info("机器码重置完成")
             sys.exit(0)
+        elif choice == 4:
+            # 仅修改 Cursor.app
+            patch_cursor_get_machine_id.patch_cursor_get_machine_id()
+            logging.info("Cursor.app 修改完成")
+            sys.exit(0)
 
-        # 小于0.45的版本需要打补丁
-        if not greater_than_0_45:
-            ExitCursor()
         logging.info("正在初始化浏览器...")
-
         # 获取user_agent
         user_agent = get_user_agent()
         if not user_agent:
@@ -397,8 +414,15 @@ if __name__ == "__main__":
                     email=account, access_token=token, refresh_token=token
                 )
 
-                logging.info("重置机器码...")
-                reset_machine_id(greater_than_0_45)
+                if choice == 2:
+                    logging.info("执行重置机器码...")
+                    MachineIDResetter().reset_machine_ids()
+                    logging.info("机器码重置完成")
+                elif choice == 3:
+                    logging.info("执行完整流程，包括修改Cursor.app...")
+                    patch_cursor_get_machine_id.patch_cursor_get_machine_id()
+                    MachineIDResetter().reset_machine_ids()
+                
                 logging.info("所有操作已完成")
             else:
                 logging.error("获取会话令牌失败，注册流程未完成")
