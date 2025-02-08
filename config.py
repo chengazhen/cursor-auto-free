@@ -23,6 +23,9 @@ class Config:
         # 加载 .env 文件
         load_dotenv(dotenv_path)
 
+        # 添加Cursor路径配置
+        self.cursor_path = os.getenv("CURSOR_PATH", "").strip()
+        
         self.imap = False
         self.temp_mail = os.getenv("TEMP_MAIL", "").strip().split("@")[0]
         self.temp_mail_epin = os.getenv("TEMP_MAIL_EPIN", "").strip()
@@ -65,6 +68,14 @@ class Config:
 
     def get_domain(self):
         return self.domain
+
+    def get_cursor_path(self):
+        """获取Cursor安装路径
+        
+        Returns:
+            str: Cursor安装路径，如果未配置则返回空字符串
+        """
+        return self.cursor_path
 
     def check_config(self):
         """检查配置项是否有效
@@ -123,6 +134,8 @@ class Config:
         return isinstance(value, str) and len(str(value).strip()) > 0
 
     def print_config(self):
+        if self.cursor_path:
+            logging.info(f"\033[32mCursor安装路径: {self.cursor_path}\033[0m")
         if self.imap:
             logging.info(f"\033[32mIMAP服务器: {self.imap_server}\033[0m")
             logging.info(f"\033[32mIMAP端口: {self.imap_port}\033[0m")
