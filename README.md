@@ -30,7 +30,11 @@
 ## 感谢 linuxDo 这个开源社区(一个真正的技术社区)
 https://linux.do/
 
+## 特别鸣谢
+本项目的开发过程中得到了众多开源项目和社区成员的支持与帮助，在此特别感谢：
 
+### 开源项目
+- [go-cursor-help](https://github.com/yuaotian/go-cursor-help) - 一个优秀的 Cursor 机器码重置工具，本项目的机器码重置功能使用该项目实现。该项目目前已获得 9.1k Stars，是最受欢迎的 Cursor 辅助工具之一。
 
 ## 请我喝杯茶
 <img src="./screen/28613e3f3f23a935b66a7ba31ff4e3f.jpg" width="300"/> <img src="./screen/mm_facetoface_collect_qrcode_1738583247120.png" width="300"/>

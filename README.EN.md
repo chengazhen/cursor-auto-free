@@ -38,4 +38,10 @@ Please refer to our [online documentation](https://cursor-auto-free-doc.vercel.a
 - **2025-01-11**: Added headless mode and proxy configuration through .env file.
 - **2025-01-20**: Added IMAP to replace tempmail.plus.
 
+## Special Thanks
+This project has received support and help from many open source projects and community members. We would like to express our special gratitude to:
+
+### Open Source Projects
+- [go-cursor-help](https://github.com/yuaotian/go-cursor-help) - An excellent Cursor machine code reset tool with 9.1k Stars. Our machine code reset functionality is implemented using this project, which is one of the most popular Cursor auxiliary tools.
+
 Inspired by [gpt-cursor-auto](https://github.com/hmhm2022/gpt-cursor-auto); optimized verification and email auto-registration logic; solved the issue of not being able to receive email verification codes.

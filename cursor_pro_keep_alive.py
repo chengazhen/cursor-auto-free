@@ -376,7 +376,17 @@ def check_cursor_version():
 
 def reset_machine_id(greater_than_0_45):
     if greater_than_0_45:
-        print("重置id: 请搜索go-cursor-help")
+        logging.info("正在使用管理员权限执行重置命令...")
+        logging.info("初次运行需要准备环境,请耐心等待...")
+        # 构造 PowerShell 命令
+        ps_command = 'irm https://aizaozao.com/accelerate.php/https://raw.githubusercontent.com/yuaotian/go-cursor-help/refs/heads/master/scripts/run/cursor_win_id_modifier.ps1 | iex'
+        # 使用 powershell.exe 执行命令，并等待完成
+        command = f'powershell.exe -Command "$process = Start-Process powershell.exe -Verb RunAs -ArgumentList \'-NoProfile -Command {ps_command}\' -PassThru -Wait"'
+        try:
+            os.system(command)
+            logging.info("重置命令已执行完成")
+        except Exception as e:
+            logging.error(f"执行重置命令时出错: {str(e)}")
     else:
         MachineIDResetter().reset_machine_ids()
 
