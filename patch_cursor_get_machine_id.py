@@ -49,6 +49,9 @@ def get_cursor_paths() -> Tuple[str, str]:
         },
         "Windows": {
             "base": os.path.join(
+                os.getenv("CURSOR_PATH", ""), 
+                "resources", "app"
+            ) if os.getenv("CURSOR_PATH") else os.path.join(
                 os.getenv("LOCALAPPDATA", ""), "Programs", "Cursor", "resources", "app"
             ),
             "package": "package.json",
@@ -72,10 +75,15 @@ def get_cursor_paths() -> Tuple[str, str]:
         raise OSError("在 Linux 系统上未找到 Cursor 安装路径")
 
     base_path = paths_map[system]["base"]
-    return (
-        os.path.join(base_path, paths_map[system]["package"]),
-        os.path.join(base_path, paths_map[system]["main"]),
-    )
+    pkg_path = os.path.join(base_path, paths_map[system]["package"])
+    main_path = os.path.join(base_path, paths_map[system]["main"])
+
+    # 验证路径是否存在
+    if not os.path.exists(base_path):
+        logger.error(f"Cursor 安装路径不存在: {base_path}")
+        raise OSError(f"Cursor 安装路径不存在: {base_path}")
+
+    return (pkg_path, main_path)
 
 
 def check_system_requirements(pkg_path: str, main_path: str) -> bool:
