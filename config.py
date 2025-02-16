@@ -66,6 +66,14 @@ class Config:
     def get_domain(self):
         return self.domain
 
+    def get_protocol(self):
+        """获取邮件协议类型
+        
+        Returns:
+            str: 'IMAP' 或 'POP3'
+        """
+        return os.getenv('IMAP_PROTOCOL', 'POP3')
+
     def check_config(self):
         """检查配置项是否有效
 

@@ -5,6 +5,8 @@ from config import Config
 import requests
 import email
 import imaplib
+import poplib
+from email.parser import Parser
 
 
 class EmailVerificationHandler:
@@ -14,6 +16,8 @@ class EmailVerificationHandler:
         self.epin = Config().get_temp_mail_epin()
         self.session = requests.Session()
         self.emailExtension = Config().get_temp_mail_ext()
+        # 获取协议类型，默认为 POP3
+        self.protocol = Config().get_protocol() or 'POP3'
 
     def get_verification_code(self, max_retries=5, retry_interval=60):
         """
@@ -37,7 +41,10 @@ class EmailVerificationHandler:
                         self._cleanup_mail(first_id)
                         return verify_code
                 else:
-                    verify_code = self._get_mail_code_by_imap()
+                    if self.protocol.upper() == 'IMAP':
+                        verify_code = self._get_mail_code_by_imap()
+                    else:
+                        verify_code = self._get_mail_code_by_pop3()
                     if verify_code is not None:
                         return verify_code
 
@@ -128,6 +135,71 @@ class EmailVerificationHandler:
                     return body
                 except Exception as e:
                     logging.error(f"解码邮件正文失败: {e}")
+        return ""
+
+    # 使用 POP3 获取邮件
+    def _get_mail_code_by_pop3(self, retry = 0):
+        if retry > 0:
+            time.sleep(3)
+        if retry >= 20:
+            raise Exception("获取验证码超时")
+        
+        pop3 = None
+        try:
+            # 连接到服务器
+            pop3 = poplib.POP3_SSL(self.imap['imap_server'], int(self.imap['imap_port']))
+            pop3.user(self.imap['imap_user'])
+            pop3.pass_(self.imap['imap_pass'])
+            
+            # 获取最新的10封邮件
+            num_messages = len(pop3.list()[1])
+            for i in range(max(1, num_messages-9), num_messages+1):
+                response, lines, octets = pop3.retr(i)
+                msg_content = b'\r\n'.join(lines).decode('utf-8')
+                msg = Parser().parsestr(msg_content)
+                
+                # 检查发件人
+                if 'no-reply@cursor.sh' in msg.get('From', ''):
+                    # 提取邮件正文
+                    body = self._extract_pop3_body(msg)
+                    if body:
+                        # 查找验证码
+                        code_match = re.search(r"\b\d{6}\b", body)
+                        if code_match:
+                            code = code_match.group()
+                            pop3.quit()
+                            return code
+            
+            pop3.quit()
+            return self._get_mail_code_by_pop3(retry=retry + 1)
+            
+        except Exception as e:
+            print(f"发生错误: {e}")
+            if pop3:
+                try:
+                    pop3.quit()
+                except:
+                    pass
+            return None
+
+    def _extract_pop3_body(self, email_message):
+        # 提取邮件正文
+        if email_message.is_multipart():
+            for part in email_message.walk():
+                content_type = part.get_content_type()
+                content_disposition = str(part.get("Content-Disposition"))
+                if content_type == "text/plain" and "attachment" not in content_disposition:
+                    try:
+                        body = part.get_payload(decode=True).decode('utf-8', errors='ignore')
+                        return body
+                    except Exception as e:
+                        logging.error(f"解码邮件正文失败: {e}")
+        else:
+            try:
+                body = email_message.get_payload(decode=True).decode('utf-8', errors='ignore')
+                return body
+            except Exception as e:
+                logging.error(f"解码邮件正文失败: {e}")
         return ""
 
     # 手动输入验证码
