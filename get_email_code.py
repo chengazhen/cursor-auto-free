@@ -37,7 +37,7 @@ class EmailVerificationHandler:
                         self._cleanup_mail(first_id)
                         return verify_code
                 else:
-                    verify_code = self._get_mail_code_by_imap()
+                    verify_code = input("暂未获取,手动输入验证码: ")  # 手动输入验证码
                     if verify_code is not None:
                         return verify_code
 
