@@ -37,7 +37,7 @@ class EmailVerificationHandler:
                         self._cleanup_mail(first_id)
                         return verify_code
                 else:
-                    verify_code = input("暂未获取,手动输入验证码: ")  # 手动输入验证码
+                    verify_code = self._get_mail_code_by_imap()
                     if verify_code is not None:
                         return verify_code
 
@@ -50,10 +50,9 @@ class EmailVerificationHandler:
                 if attempt < max_retries - 1:
                     logging.error(f"发生错误，{retry_interval} 秒后重试...")
                     time.sleep(retry_interval)
-                else:
-                    raise Exception(f"获取验证码失败且已达最大重试次数: {e}") from e
 
-        raise Exception(f"经过 {max_retries} 次尝试后仍未获取到验证码。")
+        verify_code = input("暂未获取,手动输入验证码: ")  # 手动输入验证码
+        return verify_code
 
     # 使用imap获取邮件
     def _get_mail_code_by_imap(self, retry = 0):
