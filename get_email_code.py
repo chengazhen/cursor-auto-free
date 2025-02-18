@@ -15,7 +15,7 @@ class EmailVerificationHandler:
         self.session = requests.Session()
         self.emailExtension = Config().get_temp_mail_ext()
 
-    def get_verification_code(self, max_retries=5, retry_interval=60):
+    def get_verification_code(self, max_retries=6, retry_interval=10):
         """
         获取验证码，带有重试机制。
 
