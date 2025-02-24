@@ -90,7 +90,7 @@ class EmailVerificationHandler:
             body = self._extract_imap_body(email_message)
             if body:
                 # 使用正则表达式查找6位数字验证码
-                code_match = re.search(r"\b\d{6}\b", body)
+                code_match = re.search(r'(?<![\w@.])\d{6}(?![\w@.])', body)
                 if code_match:
                     code = code_match.group()
                     # 删除邮件
