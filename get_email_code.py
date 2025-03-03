@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import time
 import re
@@ -73,9 +74,18 @@ class EmailVerificationHandler:
             # 连接到IMAP服务器
             mail = imaplib.IMAP4_SSL(self.imap['imap_server'], self.imap['imap_port'])
             mail.login(self.imap['imap_user'], self.imap['imap_pass'])
+            search_by_date=False
+            # 针对网易系邮箱，imap登录后需要附带联系信息，且后续邮件搜索逻辑更改为获取当天的未读邮件
+            if self.imap['imap_user'].endswith(('@163.com', '@126.com', '@yeah.net')):                
+                imap_id = ("name", self.imap['imap_user'].split('@')[0], "contact", self.imap['imap_user'], "version", "1.0.0", "vendor", "imaplib")
+                mail.xatom('ID', '("' + '" "'.join(imap_id) + '")')
+                search_by_date=True
             mail.select(self.imap['imap_dir'])
-
-            status, messages = mail.search(None, 'TO', '"'+self.account+'"')
+            if search_by_date:
+                date = datetime.now().strftime("%d-%b-%Y")
+                status, messages = mail.search(None, f'ON {date} UNSEEN')
+            else:
+                status, messages = mail.search(None, 'TO', '"'+self.account+'"')
             if status != 'OK':
                 return None
 
@@ -84,29 +94,26 @@ class EmailVerificationHandler:
                 # 没有获取到，就在获取一次
                 return self._get_mail_code_by_imap(retry=retry + 1)
 
-            latest_mail_id = mail_ids[-1]
+            for mail_id in reversed(mail_ids):
+                status, msg_data = mail.fetch(mail_id, '(RFC822)')
+                if status != 'OK':
+                    continue
+                raw_email = msg_data[0][1]
+                email_message = email.message_from_bytes(raw_email)
 
-            # 获取邮件内容
-            status, msg_data = mail.fetch(latest_mail_id, '(RFC822)')
-            if status != 'OK':
-                return None
-
-            raw_email = msg_data[0][1]
-            email_message = email.message_from_bytes(raw_email)
-
-            # 提取邮件正文
-            body = self._extract_imap_body(email_message)
-            if body:
-                # 使用正则表达式查找6位数字验证码
-                code_match = re.search(r"\b\d{6}\b", body)
-                if code_match:
-                    code = code_match.group()
-                    # 删除邮件
-                    mail.store(latest_mail_id, '+FLAGS', '\\Deleted')
-                    mail.expunge()
-                    mail.logout()
-                    # print(f"找到的验证码: {code}")
-                    return code
+                # 如果是按日期搜索的邮件，需要进一步核对收件人地址是否对应
+                if search_by_date and email_message['to'] !=self.account:
+                    continue
+                body = self._extract_imap_body(email_message)
+                if body:
+                    code_match = re.search(r"\b\d{6}\b", body)
+                    if code_match:
+                        code = code_match.group()
+                        # 删除找到验证码的邮件
+                        mail.store(mail_id, '+FLAGS', '\\Deleted')
+                        mail.expunge()
+                        mail.logout()
+                        return code
             # print("未找到验证码")
             mail.logout()
             return None

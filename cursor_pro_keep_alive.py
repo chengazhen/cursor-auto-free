@@ -344,7 +344,8 @@ class EmailGenerator:
 
     def generate_email(self, length=4):
         """生成随机邮箱地址"""        
-        timestamp = str(int(time.time()))[-length:]  # 使用时间戳后n位
+        length=random.randint(0, length)  # 生成0到length之间的随机整数
+        timestamp = str(int(time.time()))[-length:]  # 使用时间戳后length位
         return f"{self.default_first_name}{timestamp}@{self.domain}"#
 
     def get_account_info(self):
