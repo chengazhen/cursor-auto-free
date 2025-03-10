@@ -102,7 +102,7 @@ class EmailVerificationHandler:
                 email_message = email.message_from_bytes(raw_email)
 
                 # 如果是按日期搜索的邮件，需要进一步核对收件人地址是否对应
-                if search_by_date and email_message['to'] !=self.account:
+                if search_by_date and email_message['to'].lower() !=self.account.lower():
                     continue
                 body = self._extract_imap_body(email_message)
                 if body:
