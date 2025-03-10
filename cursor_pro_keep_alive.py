@@ -354,7 +354,7 @@ class EmailGenerator:
         if hasattr(self, 'names') and self.names:
             num_len=random.randint(0, 4)
             timestamp = str(int(time.time()))[-num_len:]  # 使用时间戳后n位
-            return f"{self.default_first_name}{timestamp}@{self.domain}"#
+            return f"{self.default_first_name.lower()}{timestamp}@{self.domain}"#
         else:
             random_str = "".join(random.choices("abcdefghijklmnopqrstuvwxyz", k=length))
             timestamp = str(int(time.time()))[-6:]  # 使用时间戳后6位
