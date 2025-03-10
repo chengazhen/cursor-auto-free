@@ -27,7 +27,7 @@ class Config:
 
         # 处理 TEMP_MAIL（自动截断注释并提取用户名）
         temp_mail_value = os.getenv("TEMP_MAIL", "").split('#', 1)[0].strip()
-        self.temp_mail = temp_mail_value.split("@")[0] if temp_mail_value else ""
+        self.temp_mail = temp_mail_value.split("@")[0] if temp_mail_value else "null"
 
         # 处理其他带注释的环境变量
         self.temp_mail_epin = os.getenv("TEMP_MAIL_EPIN", "").split('#', 1)[0].strip()
