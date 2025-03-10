@@ -24,19 +24,24 @@ class Config:
         load_dotenv(dotenv_path)
 
         self.imap = False
-        self.temp_mail = os.getenv("TEMP_MAIL", "").strip().split("@")[0]
-        self.temp_mail_epin = os.getenv("TEMP_MAIL_EPIN", "").strip()
-        self.temp_mail_ext = os.getenv("TEMP_MAIL_EXT", "").strip()
-        self.domain = os.getenv("DOMAIN", "").strip()
 
-        # 如果临时邮箱为null则加载IMAP
-        if self.temp_mail == "null":
+        # 处理 TEMP_MAIL（自动截断注释并提取用户名）
+        temp_mail_value = os.getenv("TEMP_MAIL", "").split('#', 1)[0].strip()
+        self.temp_mail = temp_mail_value.split("@")[0] if temp_mail_value else ""
+
+        # 处理其他带注释的环境变量
+        self.temp_mail_epin = os.getenv("TEMP_MAIL_EPIN", "").split('#', 1)[0].strip()
+        self.temp_mail_ext = os.getenv("TEMP_MAIL_EXT", "").split('#', 1)[0].strip()
+        self.domain = os.getenv("DOMAIN", "").split('#', 1)[0].strip()
+
+        # 如果临时邮箱为 null 则加载 IMAP
+        if self.temp_mail.lower() == "null":  # 增加容错处理
             self.imap = True
-            self.imap_server = os.getenv("IMAP_SERVER", "").strip()
-            self.imap_port = os.getenv("IMAP_PORT", "").strip()
-            self.imap_user = os.getenv("IMAP_USER", "").strip()
-            self.imap_pass = os.getenv("IMAP_PASS", "").strip()
-            self.imap_dir = os.getenv("IMAP_DIR", "inbox").strip()
+            self.imap_server = os.getenv("IMAP_SERVER", "").split('#', 1)[0].strip()
+            self.imap_port = os.getenv("IMAP_PORT", "").split('#', 1)[0].strip()
+            self.imap_user = os.getenv("IMAP_USER", "").split('#', 1)[0].strip()
+            self.imap_pass = os.getenv("IMAP_PASS", "").split('#', 1)[0].strip()
+            self.imap_dir = os.getenv("IMAP_DIR", "inbox").split('#', 1)[0].strip().lower()
 
         self.check_config()
 
@@ -72,7 +77,7 @@ class Config:
         Returns:
             str: 'IMAP' 或 'POP3'
         """
-        return os.getenv('IMAP_PROTOCOL', 'POP3')
+        return os.getenv('IMAP_PROTOCOL', 'POP3').split('#', 1)[0].strip()
 
     def check_config(self):
         """检查配置项是否有效
