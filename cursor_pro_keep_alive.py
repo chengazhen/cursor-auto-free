@@ -333,19 +333,41 @@ class EmailGenerator:
         self.default_first_name = self.generate_random_name()
         self.default_last_name = self.generate_random_name()
 
+    def generate_random_name(self, length=6):
+        """生成随机用户名（优先使用数据集）"""
+        # 当数据集存在且非空时优先使用
+        if hasattr(self, 'names') and self.names:
+            name = random.choice(self.names).strip()
+            if name and len(name)>1:
+            # 确保首字母大写（处理可能的小写数据）
+                return name[0].upper() + name[1:].lower()
+        
+        # 数据集不可用时使用随机生成机制
+        first_letter = random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        rest_letters = "".join(
+            random.choices("abcdefghijklmnopqrstuvwxyz", k=length - 1)
+        )
+        return first_letter + rest_letters
+
+    def generate_email(self, length=8):
+        """生成随机邮箱地址（自动适配域名配置）"""
+        if hasattr(self, 'names') and self.names:
+            num_len=random.randint(0, 4)
+            timestamp = str(int(time.time()))[-num_len:]  # 使用时间戳后n位
+            return f"{self.default_first_name}{timestamp}@{self.domain}"#
+        else:
+            random_str = "".join(random.choices("abcdefghijklmnopqrstuvwxyz", k=length))
+            timestamp = str(int(time.time()))[-6:]  # 使用时间戳后6位
+            return f"{random_str}{timestamp}@{self.domain}"
+
     def load_names(self):
-        with open("names-dataset.txt", "r") as file:
-            return file.read().split()
-
-    def generate_random_name(self):
-        """生成随机用户名"""
-        return random.choice(self.names)
-
-    def generate_email(self, length=4):
-        """生成随机邮箱地址"""
-        length = random.randint(0, length)  # 生成0到length之间的随机整数
-        timestamp = str(int(time.time()))[-length:]  # 使用时间戳后length位
-        return f"{self.default_first_name}{timestamp}@{self.domain}"  #
+        """加载姓名数据集（带异常处理）"""
+        try:
+            with open("names-dataset.txt", "r", encoding="utf-8") as f:
+                return f.read().split()
+        except (FileNotFoundError, IOError):            
+            print("Warning: names-dataset.txt not found, using random generation")
+            return []
 
     def get_account_info(self):
         """获取完整的账号信息"""
