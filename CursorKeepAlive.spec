@@ -8,6 +8,7 @@ a = Analysis(
     datas=[
         ('turnstilePatch', 'turnstilePatch'),
         ('cursor_auth_manager.py', '.'),
+        ('names-dataset.txt', '.'),
     ],
     hiddenimports=[
         'cursor_auth_manager'

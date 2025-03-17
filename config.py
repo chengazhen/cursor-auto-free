@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import sys
 from logger import logging
+from language import get_translation
 
 
 class Config:
@@ -18,7 +19,7 @@ class Config:
         dotenv_path = os.path.join(application_path, ".env")
 
         if not os.path.exists(dotenv_path):
-            raise FileNotFoundError(f"文件 {dotenv_path} 不存在")
+            raise FileNotFoundError(get_translation("file_not_exists", path=dotenv_path))
 
         # 加载 .env 文件
         load_dotenv(dotenv_path)
@@ -84,40 +85,36 @@ class Config:
         """
         # 基础配置检查
         required_configs = {
-            "domain": "域名",
+            "domain": "domain_not_configured",
         }
 
         # 检查基础配置
-        for key, name in required_configs.items():
+        for key, error_key in required_configs.items():
             if not self.check_is_valid(getattr(self, key)):
-                raise ValueError(f"{name}未配置，请在 .env 文件中设置 {key.upper()}")
+                raise ValueError(get_translation(error_key))
 
         # 检查邮箱配置
         if self.temp_mail != "null":
             # tempmail.plus 模式
             if not self.check_is_valid(self.temp_mail):
-                raise ValueError("临时邮箱未配置，请在 .env 文件中设置 TEMP_MAIL")
+                raise ValueError(get_translation("temp_mail_not_configured"))
         else:
             # IMAP 模式
             imap_configs = {
-                "imap_server": "IMAP服务器",
-                "imap_port": "IMAP端口",
-                "imap_user": "IMAP用户名",
-                "imap_pass": "IMAP密码",
+                "imap_server": "imap_server_not_configured",
+                "imap_port": "imap_port_not_configured",
+                "imap_user": "imap_user_not_configured",
+                "imap_pass": "imap_pass_not_configured",
             }
 
-            for key, name in imap_configs.items():
+            for key, error_key in imap_configs.items():
                 value = getattr(self, key)
                 if value == "null" or not self.check_is_valid(value):
-                    raise ValueError(
-                        f"{name}未配置，请在 .env 文件中设置 {key.upper()}"
-                    )
+                    raise ValueError(get_translation(error_key))
 
             # IMAP_DIR 是可选的，如果设置了就检查其有效性
             if self.imap_dir != "null" and not self.check_is_valid(self.imap_dir):
-                raise ValueError(
-                    "IMAP收件箱目录配置无效，请在 .env 文件中正确设置 IMAP_DIR"
-                )
+                raise ValueError(get_translation("imap_dir_invalid"))
 
     def check_is_valid(self, value):
         """检查配置项是否有效
@@ -132,23 +129,21 @@ class Config:
 
     def print_config(self):
         if self.imap:
-            logging.info(f"\033[32mIMAP服务器: {self.imap_server}\033[0m")
-            logging.info(f"\033[32mIMAP端口: {self.imap_port}\033[0m")
-            logging.info(f"\033[32mIMAP用户名: {self.imap_user}\033[0m")
-            logging.info(f"\033[32mIMAP密码: {'*' * len(self.imap_pass)}\033[0m")
-            logging.info(f"\033[32mIMAP收件箱目录: {self.imap_dir}\033[0m")
+            logging.info(get_translation("imap_server", server=self.imap_server))
+            logging.info(get_translation("imap_port", port=self.imap_port))
+            logging.info(get_translation("imap_username", username=self.imap_user))
+            logging.info(get_translation("imap_password", password='*' * len(self.imap_pass)))
+            logging.info(get_translation("imap_inbox_dir", dir=self.imap_dir))
         if self.temp_mail != "null":
-            logging.info(
-                f"\033[32m临时邮箱: {self.temp_mail}{self.temp_mail_ext}\033[0m"
-            )
-        logging.info(f"\033[32m域名: {self.domain}\033[0m")
+            logging.info(get_translation("temp_mail", mail=f"{self.temp_mail}{self.temp_mail_ext}"))
+        logging.info(get_translation("domain", domain=self.domain))
 
 
 # 使用示例
 if __name__ == "__main__":
     try:
         config = Config()
-        print("环境变量加载成功！")
+        print(get_translation("env_variables_loaded"))
         config.print_config()
     except ValueError as e:
-        print(f"错误: {e}")
+        print(get_translation("error_prefix", error=e))

@@ -1,6 +1,16 @@
 import logging
 import os
 from datetime import datetime
+try:
+    from language import get_translation
+except ImportError:
+    # If language module is not yet imported (circular import prevention)
+    def get_translation(key, **kwargs):
+        if key == "open_source_prefix":
+            return "[Open source project: https://github.com/chengazhen/cursor-auto-free] {msg}"
+        elif key == "logger_initialized":
+            return "Logger initialized, log directory: {dir}"
+        return key
 
 # Configure logging
 log_dir = "logs"
@@ -9,11 +19,11 @@ if not os.path.exists(log_dir):
 
 
 class PrefixFormatter(logging.Formatter):
-    """自定义格式化器，为 DEBUG 级别日志添加开源项目前缀"""
+    """Custom formatter that adds an open source project prefix to DEBUG level logs"""
 
     def format(self, record):
-        if record.levelno == logging.DEBUG:  # 只给 DEBUG 级别添加前缀
-            record.msg = f"[开源项目：https://github.com/chengazhen/cursor-auto-free] {record.msg}"
+        if record.levelno == logging.DEBUG:  # Only add prefix to DEBUG level
+            record.msg = get_translation("open_source_prefix", msg=record.msg)
         return super().format(record)
 
 
@@ -28,7 +38,7 @@ logging.basicConfig(
     ],
 )
 
-# 为文件处理器设置自定义格式化器
+# Set custom formatter for file handlers
 for handler in logging.getLogger().handlers:
     if isinstance(handler, logging.FileHandler):
         handler.setFormatter(
@@ -36,16 +46,16 @@ for handler in logging.getLogger().handlers:
         )
 
 
-# 创建控制台处理器
+# Create a console handler
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(PrefixFormatter("%(message)s"))
 
-# 将控制台处理器添加到日志记录器
+# Add the console handler to the logger
 logging.getLogger().addHandler(console_handler)
 
-# 打印日志目录所在路径
-logging.info(f"Logger initialized, log directory: {os.path.abspath(log_dir)}")
+# Print log directory path
+logging.info(get_translation("logger_initialized", dir=os.path.abspath(log_dir)))
 
 
 def main_task():
