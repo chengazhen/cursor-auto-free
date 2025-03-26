@@ -106,6 +106,8 @@ class EmailVerificationHandler:
                     continue
                 body = self._extract_imap_body(email_message)
                 if body:
+                    # 避免 6 位数字的域名被误识别成验证码
+                    body = body.replace(self.account, '')
                     code_match = re.search(r"\b\d{6}\b", body)
                     if code_match:
                         code = code_match.group()
