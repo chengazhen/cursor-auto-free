@@ -14,22 +14,13 @@
 
 ### 推荐替代方案
 
-#### 🥇 **首选：Claude Code**
+#### 🥇 **首选：Claude Code / Codex**
 - **原因**：
   - Claude 代码理解能力最强，上下文管理优秀
   - 官方支持，稳定性有保障
   - 支持文件编辑、实时协作
   - 价格合理，使用体验一流
 - **适用场景**：专业开发、复杂项目
-
-#### 🥈 **次选：Codex**
-- **原因**：
-  - GitHub 官方产品，稳定性强
-  - 跨语言支持完善
-  - 与 GitHub 深度集成
-  - 企业级支持
-- **适用场景**：日常编码、团队协作
----
 
 ## 在线文档
 [cursor-auto-free-doc.vercel.app](https://cursor-auto-free-doc.vercel.app)
