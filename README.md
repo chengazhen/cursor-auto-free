@@ -1,6 +1,8 @@
 # Cursor Pro 自动化工具使用说明
 
-[English doc](./README.EN.md)
+
+## 公众号
+![公众号](./screen/qrcode_for_gh_c985615b5f2b_258.jpg)
 
 ## ⚠️ 重要提示：不再推荐使用此项目
 
@@ -8,9 +10,7 @@
 
 ### 为什么不再推荐 Cursor？
 
-1. **需要频繁续费和绕过限制** - Cursor 采用订阅制，且限制条件复杂，自动化绕过方案需要持续维护
-2. **不稳定性** - 官方持续更新反爬虫机制，自动化脚本容易失效
-3. **违反服务条款风险** - 自动化绕过官方限制存在法律和账号风险
+1. **绕过限制** - Cursor 采用订阅制，且限制条件复杂，自动化绕过方案需要持续维护
 
 ### 推荐替代方案
 
@@ -22,30 +22,21 @@
   - 价格合理，使用体验一流
 - **适用场景**：专业开发、复杂项目
 
-#### 🥈 **次选：GitHub Copilot / Codex**
+#### 🥈 **次选：Codex**
 - **原因**：
   - GitHub 官方产品，稳定性强
   - 跨语言支持完善
   - 与 GitHub 深度集成
   - 企业级支持
 - **适用场景**：日常编码、团队协作
-
-#### 🥉 **备选：开源方案**
-- **Ollama + LLaMA** - 完全本地化，隐私保护
-- **Jan.ai** - 轻量级 AI 编程助手
-- **Local LLM** - 根据需求自定义
-
-### 总结
-
-Cursor 已经是过去式了。现代 AI 编程助手的发展已经远超过自动化工具的价值。直接使用官方支持的方案，既能获得更好的体验，也能避免不必要的风险。
-
 ---
 
 ## 在线文档
 [cursor-auto-free-doc.vercel.app](https://cursor-auto-free-doc.vercel.app)
 
-## 公众号
-![公众号](./screen/qrcode_for_gh_c985615b5f2b_258.jpg)
+
+[English doc](./README.EN.md)
+
 
 ## 许可证声明
 本项目采用 [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) 许可证。
